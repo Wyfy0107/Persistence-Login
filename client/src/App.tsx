@@ -1,12 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
 import axios from 'axios';
+import { Switch, BrowserRouter as Router, Route } from 'react-router-dom';
+
+import Home from './components/Home';
+import Login from './components/Login';
+
+const axiosConfig = {
+  headers: {
+    Authorization: `Bearer ${localStorage.getItem('token')}`,
+  },
+};
 
 function App() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoggedIn, setLoggedIn] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const login = async () => {
     try {
@@ -21,12 +31,6 @@ function App() {
     } catch (error) {
       setLoggedIn(false);
     }
-  };
-
-  const axiosConfig = {
-    headers: {
-      Authorization: `Bearer ${localStorage.getItem('token')}`,
-    },
   };
 
   const getUserData = async () => {
@@ -48,27 +52,18 @@ function App() {
     getUserData();
   }, []);
 
-  if (loading) return <p>Loading...</p>;
-
   return (
     <div className='App'>
-      <p>Email</p>
-      <input
-        type='text'
-        onChange={e => setEmail(e.target.value)}
-        value='duy@gmail.com'
-      />
-
-      <p>Password</p>
-      <input
-        type='text'
-        onChange={e => setPassword(e.target.value)}
-        value='nguyenduy'
-      />
-
-      <button onClick={login}>Login</button>
-
-      {isLoggedIn ? <p>I am logged in</p> : <p>I am logged out</p>}
+      <Router>
+        <Switch>
+          <Route exact path='/'>
+            <Home isLoggedIn={isLoggedIn} loading={loading} />
+          </Route>
+          <Route path='/login'>
+            <Login login={login} isLoggedIn={isLoggedIn} />
+          </Route>
+        </Switch>
+      </Router>
     </div>
   );
 }
